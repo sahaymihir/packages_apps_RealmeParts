@@ -45,18 +45,16 @@ public class DeviceSettings extends PreferenceFragment
         implements Preference.OnPreferenceChangeListener {
 
     public static final String KEY_OTG_SWITCH = "otg";
-    public static final String KEY_GAME_SWITCH = "game";
+    public static final String KEY_PERF_PROFILE = "perf_profile";
+    public static final String PERF_PROFILE_SYSTEM_PROPERTY = "persist.perf_profile";
     public static final String KEY_CHARGING_SWITCH = "smart_charging";
     public static final String KEY_CHARGING_SPEED = "charging_speed";
     public static final String KEY_RESET_STATS = "reset_stats";
-    public static final String KEY_DND_SWITCH = "dnd";
     public static final String KEY_DT2W_SWITCH = "dt2w";
     public static final String KEY_CABC = "cabc";
     public static final String CABC_SYSTEM_PROPERTY = "persist.cabc_profile";
     public static final String KEY_FPS_INFO = "fps_info";
     public static final String KEY_SETTINGS_PREFIX = "device_setting_";
-    public static final String TP_LIMIT_ENABLE = "/proc/touchpanel/oppo_tp_limit_enable";
-    public static final String TP_DIRECTION = "/proc/touchpanel/oppo_tp_direction";
     private static final String ProductName = Utils.ProductName();
     private static final String KEY_CATEGORY_CHARGING = "charging";
     private static final String KEY_CATEGORY_GRAPHICS = "graphics";
@@ -70,14 +68,13 @@ public class DeviceSettings extends PreferenceFragment
     public static SeekBarPreference mSeekBarPreference;
     public static DisplayManager mDisplayManager;
     private static NotificationManager mNotificationManager;
-    public TwoStatePreference mDNDSwitch;
     public PreferenceCategory mPreferenceCategory;
     private TwoStatePreference mOTGModeSwitch;
-    private TwoStatePreference mGameModeSwitch;
     private TwoStatePreference mSmartChargingSwitch;
     private SwitchPreference mFpsInfo;
     private boolean CABC_DeviceMatched;
     private SecureSettingListPreference mCABC;
+    private SecureSettingListPreference mPerfProfile;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -91,15 +88,6 @@ public class DeviceSettings extends PreferenceFragment
         mOTGModeSwitch.setEnabled(OTGModeSwitch.isSupported());
         mOTGModeSwitch.setChecked(OTGModeSwitch.isCurrentlyEnabled(this.getContext()));
         mOTGModeSwitch.setOnPreferenceChangeListener(new OTGModeSwitch());
-
-        mGameModeSwitch = findPreference(KEY_GAME_SWITCH);
-        mGameModeSwitch.setEnabled(GameModeSwitch.isSupported());
-        mGameModeSwitch.setChecked(GameModeSwitch.isCurrentlyEnabled(this.getContext()));
-        mGameModeSwitch.setOnPreferenceChangeListener(new GameModeSwitch(getContext()));
-
-        mDNDSwitch = findPreference(KEY_DND_SWITCH);
-        mDNDSwitch.setChecked(prefs.getBoolean(KEY_DND_SWITCH, false));
-        mDNDSwitch.setOnPreferenceChangeListener(this);
 
         mSmartChargingSwitch = findPreference(KEY_CHARGING_SWITCH);
         mSmartChargingSwitch.setChecked(prefs.getBoolean(KEY_CHARGING_SWITCH, false));
@@ -138,6 +126,11 @@ public class DeviceSettings extends PreferenceFragment
         mCABC.setValue(Utils.getStringProp(CABC_SYSTEM_PROPERTY, "0"));
         mCABC.setSummary(mCABC.getEntry());
         mCABC.setOnPreferenceChangeListener(this);
+
+        mPerfProfile = (SecureSettingListPreference) findPreference(KEY_PERF_PROFILE);
+        mPerfProfile.setValue(Utils.getStringProp(PERF_PROFILE_SYSTEM_PROPERTY, "0"));
+        mPerfProfile.setSummary(mPerfProfile.getEntry());
+        mPerfProfile.setOnPreferenceChangeListener(this);
 
         mDT2WModeSwitch = (TwoStatePreference) findPreference(KEY_DT2W_SWITCH);
         mDT2WModeSwitch.setEnabled(DT2WModeSwitch.isSupported());
@@ -197,6 +190,12 @@ public class DeviceSettings extends PreferenceFragment
             mCABC.setValue((String) newValue);
             mCABC.setSummary(mCABC.getEntry());
             Utils.setStringProp(CABC_SYSTEM_PROPERTY, (String) newValue);
+        }
+
+        if (preference == mPerfProfile) {
+            mPerfProfile.setValue((String) newValue);
+            mPerfProfile.setSummary(mPerfProfile.getEntry());
+            Utils.setStringProp(PERF_PROFILE_SYSTEM_PROPERTY, (String) newValue);
         }
         return true;
     }
@@ -264,5 +263,6 @@ public class DeviceSettings extends PreferenceFragment
             mPreferenceCategory.removePreference(findPreference(KEY_CABC));
             prefs.edit().putBoolean("CABC_DeviceMatched", false).apply();
         } else prefs.edit().putBoolean("CABC_DeviceMatched", true).apply();
+
     }
 }

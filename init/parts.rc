@@ -17,13 +17,3 @@ on property:persist.cabc_profile=2
 # CABC aggressive
 on property:persist.cabc_profile=3
     write /sys/kernel/oppo_display/cabc 3
-
-# Performance profiles
-on property:persist.perf_profile=0
-    write /sys/kernel/oppo_display/cabc 0
-
-on property:persist.perf_profile=1
-    write /sys/kernel/oppo_display/cabc 3
-
-on property:persist.perf_profile=2
-    write /sys/kernel/oppo_display/cabc 0

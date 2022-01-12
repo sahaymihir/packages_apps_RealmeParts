@@ -44,6 +44,8 @@ public class DeviceSettings extends PreferenceFragment
         implements Preference.OnPreferenceChangeListener {
 
     public static final String KEY_OTG_SWITCH = "otg";
+    public static final String KEY_PERF_PROFILE = "perf_profile";
+    public static final String PERF_PROFILE_SYSTEM_PROPERTY = "persist.perf_profile";
     public static final String KEY_CHARGING_SWITCH = "smart_charging";
     public static final String KEY_CHARGING_SPEED = "charging_speed";
     public static final String KEY_RESET_STATS = "reset_stats";
@@ -65,6 +67,7 @@ public class DeviceSettings extends PreferenceFragment
     private SwitchPreference mFpsInfo;
     private boolean CABC_DeviceMatched;
     private SecureSettingListPreference mCABC;
+    private SecureSettingListPreference mPerfProfile;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -104,6 +107,11 @@ public class DeviceSettings extends PreferenceFragment
         mCABC.setSummary(mCABC.getEntry());
         mCABC.setOnPreferenceChangeListener(this);
 
+        mPerfProfile = (SecureSettingListPreference) findPreference(KEY_PERF_PROFILE);
+        mPerfProfile.setValue(Utils.getStringProp(PERF_PROFILE_SYSTEM_PROPERTY, "0"));
+        mPerfProfile.setSummary(mPerfProfile.getEntry());
+        mPerfProfile.setOnPreferenceChangeListener(this);
+
         isCoolDownAvailable();
         try {
             ParseJson();
@@ -132,6 +140,12 @@ public class DeviceSettings extends PreferenceFragment
             mCABC.setValue((String) newValue);
             mCABC.setSummary(mCABC.getEntry());
             Utils.setStringProp(CABC_SYSTEM_PROPERTY, (String) newValue);
+        }
+
+        if (preference == mPerfProfile) {
+            mPerfProfile.setValue((String) newValue);
+            mPerfProfile.setSummary(mPerfProfile.getEntry());
+            Utils.setStringProp(PERF_PROFILE_SYSTEM_PROPERTY, (String) newValue);
         }
         return true;
     }
